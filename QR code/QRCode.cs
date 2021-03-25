@@ -8,34 +8,36 @@ using QR_code.Tables;
 
 namespace QR_code
 {
-    class QRCodeCreator
+    partial class QRCodeCreator
     {
         public object CreateQRCode(byte[] bytesToCode)
         {
             QRCodeBytes qr = new QRCodeBytes(bytesToCode);
+            QRCodeWriter qrwr = new QRCodeWriter(qr.Service, qr.ToWrite);
             return null;
         }
 
         private class QRCodeBytes
         {
             private static bool[][] MissingBits = new bool[][] { new bool[] { true, true, true, false, true, true, false, false }, new bool[] { false, false, false, true, false, false, false, true } };//11101100 00010001
-            private QRCodeServiceInformation Service;
-            private byte[] ToWrite;
-
+            public QRCodeServiceInformation Service;
+            public byte[] ToWrite;
 
             public QRCodeBytes(byte[] bytesToCode)
             {
-                GenerateQRCode(bytesToCode);
+                GenerateBytesToWrite(bytesToCode);
             }
 
-            public void GenerateQRCode(byte[] bytesToCode)
+            public void GenerateBytesToWrite(byte[] bytesToCode)
             {
-                Service = QRPayloadLengthForVerAndCLvl.GetServiceInformationForDataLength(bytesToCode.Length * 8, QRCodeServiceInformation.CorrectionLvl.L);
+                Service = QRPayloadLengthForVerAndCLvl.GetServiceInformationForDataLength(bytesToCode.Length * 8, QRCodeServiceInformation.CorrectionLvl.H);
                 bool[] allBits = GetQRBits(bytesToCode);
                 byte[] allBytes = BitsToBytes(allBits);
                 byte[][] allBlocks = CreateQRBlocks(allBytes);
                 byte[][] correctionBytes = CreateCorrectionBytes(allBlocks);
                 ToWrite = AlternatelyCombining(allBlocks, correctionBytes);
+                Console.WriteLine("Service: " + Service);
+                Console.WriteLine("ToWrite: " + ToWrite.Length);
             }
 
             //подготавливает биты, записывает в них способ кодирования, количество данных и сами данные
@@ -138,7 +140,7 @@ namespace QR_code
                 return outStream;
             }
 
-            private static List<bool> BytesToBits(byte[] bytes)
+            public static List<bool> BytesToBits(byte[] bytes)
             {
                 List<bool> bits = new List<bool>(bytes.Length * 8);
                 foreach (byte b in bytes)
