@@ -13,7 +13,7 @@ namespace QR_code
         {
             string input = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)+@"\123.txt");
 
-            input = Console.ReadLine();
+            
             QRCodeCreator qrCodeCreator = new QRCodeCreator();
             qrCodeCreator.CreateQRCode(Encoding.ASCII.GetBytes(input));
             Console.WriteLine("ready");

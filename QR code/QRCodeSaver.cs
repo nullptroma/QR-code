@@ -24,12 +24,14 @@ namespace QR_code
 
             private static void Save()
             {
-                Image = new Bitmap(QRCode.Length, QRCode.Length);
-                for (int y = 0; y < QRCode.Length; y++)
-                    for (int x = 0; x < QRCode.Length; x++)
-                        Image.SetPixel(x,y, QRCode[y][x]==1?Color.Black : Color.White);
+                Image = new Bitmap(QRCode.Length+8, QRCode.Length+8);
+                using (var g = Graphics.FromImage(Image))
+                    g.Clear(Color.White);
+                for (int y = 4; y < Image.Height-4; y++)
+                    for (int x = 4; x < Image.Width- 4; x++)
+                        Image.SetPixel(x,y, QRCode[y-4][x-4]==1?Color.Black : Color.White);
 
-                Zoom(Image, 50).Save(Path);
+                Zoom(Image, SectorSize).Save(Path);
             }
 
             private static Bitmap Zoom(Bitmap image, int k)
